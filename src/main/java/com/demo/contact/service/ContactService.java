@@ -4,8 +4,13 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 import com.demo.contact.domain.Contact;
+import com.demo.contact.domain.FavoriteMovie;
+import com.demo.contact.domain.Movie;
+import com.demo.contact.repository.FavoriteMovieRepository;
+import com.demo.contact.repository.MovieRepository;
 import com.demo.contact.util.ContactUtils;
 import com.demo.contact.web.ContactController;
+import com.demo.contact.web.request.ScoreRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +21,10 @@ public class ContactService {
 
 	@Autowired
 	private ContactRepository contactRepository;
+	@Autowired
+	private MovieRepository movieRepository;
+	@Autowired
+	private FavoriteMovieRepository favoriteMovieRepository;
 
 	public Iterable<Contact> listContacts() {
 		Iterable<Contact> list = contactRepository.findAll();
@@ -57,6 +66,10 @@ public class ContactService {
 				linkTo(methodOn(ContactController.class).getProfilePicture(contact.getContactId())).withRel("view"));
 		contact.add(linkTo(methodOn(ContactController.class).updateContact(null)).withRel("save"));
 		return contact;
+	}
+
+	public Movie getMovieById(Long movieId) {
+		return movieRepository.findOne(movieId);
 	}
 
 	public boolean updateContact(Contact contact) {
@@ -119,4 +132,11 @@ public class ContactService {
 		return list;
 	}
 
+	public FavoriteMovie scoreMovie(ScoreRequest request) {
+		Contact contact = this.getContactById(request.getContactId());
+		Movie movie = this.getMovieById(request.getMovieId());
+		FavoriteMovie favoriteMovie = new FavoriteMovie(request.getScore(), request.getObservation(), movie, contact);
+		favoriteMovie = favoriteMovieRepository.save(favoriteMovie);
+		return favoriteMovie;
+	}
 }

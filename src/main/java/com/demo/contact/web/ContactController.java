@@ -1,5 +1,7 @@
 package com.demo.contact.web;
 
+import com.demo.contact.domain.FavoriteMovie;
+import com.demo.contact.web.request.ScoreRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
@@ -88,5 +90,10 @@ public class ContactController {
 	@RequestMapping(value = "profilePicture/{contactId}", method = RequestMethod.GET, produces = MediaType.IMAGE_JPEG_VALUE)
 	public ResponseEntity<InputStreamResource> getProfilePicture(@PathVariable("contactId") Long contactId) {
 		return ResponseEntity.ok().body(new InputStreamResource(ContactUtils.getProfilePicture(contactId)));
+	}
+
+	@RequestMapping(value = "scoreMovie", method = RequestMethod.POST)
+	public FavoriteMovie scoreMovie(@RequestBody ScoreRequest request) {
+		return contactService.scoreMovie(request);
 	}
 }
